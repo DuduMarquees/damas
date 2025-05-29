@@ -1,0 +1,14 @@
+./damas/ui/P2.java
+./damas/ui/InterfaceJogo.java
+./damas/core/CorPeca.java
+./damas/core/Jogador.java
+./damas/core/Posicao.java
+./damas/core/PecaSimples.java
+./damas/core/Tabuleiro.java
+./damas/core/PecaDama.java
+./damas/core/Peca.java
+./damas/core/ConfiguracaoJogo.java
+./damas/core/Jogo.java
+./damas/core/P1.java
+./damas/exceptions/PosicaoInvalidaException.java
+./damas/exceptions/MovimentoInvalidoException.java
