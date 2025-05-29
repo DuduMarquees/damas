@@ -31,7 +31,13 @@ public class InterfaceJogo extends JFrame {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 JButton btn = new JButton();
-                btn.setPreferredSize(new Dimension(60, 60));
+                btn.setPreferredSize(new Dimension(80, 80));
+
+                // Remove fundo opaco, bordas e deixa apenas o conteúdo (emoji/ícone) visível
+                btn.setContentAreaFilled(false);  // Remove o fundo cinza
+                btn.setBorderPainted(false);      // Remove a borda do botão
+                btn.setOpaque(false);             // Garante transparência
+
                 btn.setFont(new Font("Arial", Font.BOLD, 24));
                 btn.setOpaque(true);
                 
