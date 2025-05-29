@@ -5,9 +5,7 @@ import java.awt.*;
 import java.io.IOException;
 import damas.core.*;
 
-/**
- * Interface gráfica ULTRA SIMPLES - sem código antigo
- */
+
 public class InterfaceJogo extends JFrame {
     private Jogo jogo;
     private JButton[][] botoes;
@@ -80,10 +78,10 @@ public class InterfaceJogo extends JFrame {
                     Peca peca = jogo.getTabuleiro().getPeca(new Posicao(i, j));
                     if (peca != null) {
                         if (peca.getCor() == CorPeca.BRANCA) {
-                            botoes[i][j].setText("R");
+                            botoes[i][j].setText("🔴");
                             botoes[i][j].setForeground(Color.RED);
                         } else {
-                            botoes[i][j].setText("P");
+                            botoes[i][j].setText("⚫");
                             botoes[i][j].setForeground(Color.BLACK);
                         }
                     } else {
