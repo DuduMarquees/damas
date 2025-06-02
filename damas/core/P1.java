@@ -12,7 +12,7 @@ public class P1 {
             System.out.println("=== Inicializador do Jogo de Damas ===");
             
             // Lê dados iniciais do arquivo texto
-            ConfiguracaoJogo config = lerConfiguracaoArquivo("config_inicial.txt");
+            ConfiguracaoJogo config = lerConfiguracaoArquivo("damas/config_inicial.txt");
             
             // Salva em formato binário
             salvarConfiguracaoBinaria(config, "jogo_config.dat");
