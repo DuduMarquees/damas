@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import damas.core.*;
+import java.io.*;
 
 public class InterfaceJogo extends JFrame {
     private Jogo jogo;
@@ -14,6 +15,7 @@ public class InterfaceJogo extends JFrame {
     // Cores do tabuleiro
     private final Color COR_CLARA = new Color(240, 217, 181); // Bege claro
     private final Color COR_ESCURA = new Color(181, 136, 99); // Marrom claro
+    private final Color COR_DESTAQUE = new Color(255, 255, 102); // Amarelo
     
     public InterfaceJogo(Jogo jogo) {
         this.jogo = jogo;
@@ -33,9 +35,8 @@ public class InterfaceJogo extends JFrame {
         JPanel tabuleiro = new JPanel(new GridLayout(8, 8));
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                JButton btn = new JButton();
-                btn.setPreferredSize(new Dimension(80, 80));
-                btn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 24));
+                JButton btn = new JButton();                btn.setPreferredSize(new Dimension(80, 80));
+                btn.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 48));
                 btn.setHorizontalAlignment(SwingConstants.CENTER);
                 
                 // Configuração CRUCIAL para o fundo visível
@@ -65,25 +66,39 @@ public class InterfaceJogo extends JFrame {
         atualizarInterface();
     }
 
+    private void limparDestaques() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                JButton btn = botoes[i][j];
+                btn.setBorder(null);
+                btn.setBackground((i + j) % 2 == 0 ? COR_CLARA : COR_ESCURA);
+            }
+        }
+    }
+
     private void atualizarInterface() {
-        // Atualiza peças
+        limparDestaques();
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 try {
                     Peca peca = jogo.getTabuleiro().getPeca(new Posicao(i, j));
                     JButton btn = botoes[i][j];
                     btn.setText("");
-                    btn.setBorder(null);
-                    
+
                     if (peca != null) {
                         if (peca instanceof PecaDama) {
-                            btn.setText(peca.getCor() == CorPeca.BRANCA ? "🫅" : "👑");
+                            btn.setText(peca.getCor() == CorPeca.BRANCA ? "♔" : "♚");
                         } else {
-                            btn.setText(peca.getCor() == CorPeca.BRANCA ? "🔴" : "⚫");
+                            btn.setText(peca.getCor() == CorPeca.BRANCA ? "⚪" : "⚫");
                         }
+                        btn.setEnabled(peca.getCor() == jogo.getJogadorAtual().getCor());
+                    } else {
+                        btn.setEnabled(true);
                     }
+                    btn.setEnabled(true);
                 } catch (Exception e) {
                     botoes[i][j].setText("");
+                    botoes[i][j].setEnabled(true);
                 }
             }
         }
@@ -101,9 +116,12 @@ public class InterfaceJogo extends JFrame {
             if (selecionada == null) {
                 Peca peca = jogo.getTabuleiro().getPeca(pos);
                 if (peca != null && peca.getCor() == jogo.getJogadorAtual().getCor()) {
+                    limparDestaques();
                     selecionada = pos;
-                    botoes[linha][coluna].setBorder(BorderFactory.createLineBorder(new Color(255, 215, 0), 2));
-                    
+                    JButton btnSel = botoes[linha][coluna];
+                    btnSel.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 2));
+                    btnSel.setBackground(COR_DESTAQUE);
+
                     // Mostra movimentos válidos
                     for (int i = 0; i < 8; i++) {
                         for (int j = 0; j < 8; j++) {
@@ -114,7 +132,7 @@ public class InterfaceJogo extends JFrame {
                         }
                     }
                 } else {
-                    infoLabel.setText("ATENÇÃO: É a vez das peças " + jogo.getJogadorAtual().getCor());
+                    infoLabel.setText("ATENÇÃO: selecione uma peça " + jogo.getJogadorAtual().getCor());
                 }
             } else {
                 if (selecionada.equals(pos)) {
@@ -124,6 +142,9 @@ public class InterfaceJogo extends JFrame {
                 } else if (jogo.executarMovimento(selecionada, pos)) {
                     selecionada = null;
                     atualizarInterface();
+                    if (!jogo.isJogoAtivo()) {
+                        mostrarFimDeJogo();
+                    }
                 } else {
                     infoLabel.setText("Movimento inválido! Tente novamente.");
                 }
@@ -144,5 +165,57 @@ public class InterfaceJogo extends JFrame {
 
     public void iniciar() {
         setVisible(true);
+    }
+
+    private void mostrarFimDeJogo() {
+        JDialog dialog = new JDialog(this, "Fim de Jogo", true);
+        dialog.setLayout(new BorderLayout());
+
+        String msg = "Vencedor: " + jogo.getVencedor().getNome();
+        JLabel lbl = new JLabel(msg, JLabel.CENTER);
+        lbl.setFont(new Font("Arial", Font.BOLD, 16));
+        dialog.add(lbl, BorderLayout.NORTH);
+
+        String stats = String.format("%s\n%s\nTotal de movimentos: %d",
+            jogo.getJogador1(), jogo.getJogador2(), jogo.getHistoricoMovimentos().size());
+        JTextArea area = new JTextArea(stats);
+        area.setEditable(false);
+        dialog.add(area, BorderLayout.CENTER);
+
+        JButton btnSalvar = new JButton("Salvar Log");
+        btnSalvar.addActionListener(e -> { salvarLog(); dialog.dispose(); });
+
+        JButton btnSalvarNovo = new JButton("Salvar e Nova Partida");
+        btnSalvarNovo.addActionListener(e -> {
+            salvarLog();
+            dialog.dispose();
+            iniciarNovoJogo();
+        });
+
+        JPanel painel = new JPanel();
+        painel.add(btnSalvar);
+        painel.add(btnSalvarNovo);
+        dialog.add(painel, BorderLayout.SOUTH);
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
+    private void iniciarNovoJogo() {
+        try {
+            ConfiguracaoJogo config = carregarConfiguracaoBinaria("jogo_config.dat");
+            this.jogo = new Jogo(config);
+            this.selecionada = null;
+            atualizarInterface();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erro ao reiniciar: " + ex.getMessage());
+        }
+    }
+
+    private static ConfiguracaoJogo carregarConfiguracaoBinaria(String arquivo) throws IOException, ClassNotFoundException {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(arquivo))) {
+            return (ConfiguracaoJogo) ois.readObject();
+        }
     }
 }

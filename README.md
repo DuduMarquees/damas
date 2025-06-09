@@ -4,7 +4,7 @@ Um jogo de damas desenvolvido em Java com interface gráfica.
 
 Jogo de damas completo para 2 jogadores
 Interface gráfica com tabuleiro visual
-Peças representadas por emojis: 🔴 (brancas), ⚫ (pretas), 🫅 (dama branca), 👑 (dama preta)
+Peças representadas por emojis: ⚪ (brancas), ⚫ (pretas), ♔ (dama branca), ♚ (dama preta)
 Validação automática de movimentos
 Promoção de peças simples para damas
 Sistema de log que salva o histórico da partida
@@ -18,11 +18,21 @@ Nome do Jogador 2
 BRANCA
 A última linha define a cor do primeiro jogador (BRANCA ou PRETA).
 
-2. Executar o jogo
-Primeiro, execute a configuração:
-bashjava damas.core.P1
-Depois, inicie o jogo:
-bashjava damas.ui.P2
+2. Compilar e executar o jogo
+Primeiro, compile todas as classes:
+```
+javac -d bin damas\core\*.java damas\exceptions\*.java damas\ui\*.java
+```
+
+Depois, execute a configuração:
+```
+java -cp bin damas.core.P1
+```
+
+Por fim, inicie o jogo:
+```
+java -cp bin damas.ui.P2
+```
 
 3. Como jogar
 

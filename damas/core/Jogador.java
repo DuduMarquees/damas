@@ -31,8 +31,8 @@ public class Jogador implements Serializable {
         return pecasCapturadas;
     }
     
-    public void incrementarPecasCapturadas() {
-        this.pecasCapturadas++;
+    public void incrementarPecasCapturadas(int quantidade) {
+        this.pecasCapturadas += quantidade;
     }
     
     @Override

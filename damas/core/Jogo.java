@@ -16,6 +16,7 @@ public class Jogo implements Serializable {
     private Jogador jogadorAtual;
     private List<String> historicoMovimentos;
     private boolean jogoAtivo;
+    private Jogador vencedor;
 
     public Jogo(ConfiguracaoJogo config) {
         this.tabuleiro = new Tabuleiro();
@@ -24,6 +25,7 @@ public class Jogo implements Serializable {
         this.jogadorAtual = config.getCorJogador1() == CorPeca.BRANCA ? jogador1 : jogador2;
         this.historicoMovimentos = new ArrayList<>();
         this.jogoAtivo = true;
+        this.vencedor = null;
     }
 
     public boolean executarMovimento(Posicao origem, Posicao destino) {
@@ -37,6 +39,8 @@ public class Jogo implements Serializable {
                 throw new MovimentoInvalidoException("Esta peça não pertence ao jogador atual");
             }
 
+            int totalAntes = tabuleiro.contarPecas(CorPeca.BRANCA) + tabuleiro.contarPecas(CorPeca.PRETA);
+
             tabuleiro.moverPeca(origem, destino);
 
             // Verifica promoção a dama
@@ -45,13 +49,23 @@ public class Jogo implements Serializable {
                 tabuleiro.verificarPromocaoDama(pecaMovida);
             }
 
+            // Verifica capturas ocorridas
+            int totalDepois = tabuleiro.contarPecas(CorPeca.BRANCA) + tabuleiro.contarPecas(CorPeca.PRETA);
+            int capturas = totalAntes - totalDepois;
+            if (capturas > 0) {
+                jogadorAtual.incrementarPecasCapturadas(capturas);
+            }
+
             // Registra movimento
-            String movimento = String.format("[%s] %s: %s -> %s", 
+            String movimento = String.format("[%s] %s: %s -> %s",
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")),
                 jogadorAtual.getNome(), origem, destino);
             historicoMovimentos.add(movimento);
 
-            alternarJogador();
+            verificarFimDeJogo();
+            if (jogoAtivo) {
+                alternarJogador();
+            }
             return true;
 
         } catch (PosicaoInvalidaException | MovimentoInvalidoException e) {
@@ -62,6 +76,15 @@ public class Jogo implements Serializable {
 
     private void alternarJogador() {
         jogadorAtual = (jogadorAtual == jogador1) ? jogador2 : jogador1;
+    }
+
+    private void verificarFimDeJogo() {
+        int brancas = tabuleiro.contarPecas(CorPeca.BRANCA);
+        int pretas = tabuleiro.contarPecas(CorPeca.PRETA);
+        if (brancas == 0 || pretas == 0) {
+            jogoAtivo = false;
+            vencedor = brancas == 0 ? jogador2 : jogador1;
+        }
     }
 
     public void salvarLogPartida(String nomeArquivo) throws IOException {
@@ -75,7 +98,14 @@ public class Jogo implements Serializable {
             
             writer.write("\n=== RESULTADO ===\n");
             writer.write("Status: " + (jogoAtivo ? "Em andamento" : "Finalizado") + "\n");
-            writer.write("Próximo jogador: " + jogadorAtual.getNome() + "\n");
+            if (vencedor != null) {
+                writer.write("Vencedor: " + vencedor.getNome() + "\n");
+            } else {
+                writer.write("Próximo jogador: " + jogadorAtual.getNome() + "\n");
+            }
+            writer.write(String.format("%s capturou %d peças\n", jogador1.getNome(), jogador1.getPecasCapturadas()));
+            writer.write(String.format("%s capturou %d peças\n", jogador2.getNome(), jogador2.getPecasCapturadas()));
+            writer.write("Total de movimentos: " + historicoMovimentos.size() + "\n");
         }
     }
 
@@ -102,6 +132,10 @@ public class Jogo implements Serializable {
     
     public List<String> getHistoricoMovimentos() {
         return new ArrayList<>(historicoMovimentos);
+    }
+
+    public Jogador getVencedor() {
+        return vencedor;
     }
     
     public void finalizarJogo() {

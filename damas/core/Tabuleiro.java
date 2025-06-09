@@ -53,6 +53,10 @@ public class Tabuleiro implements Serializable {
             throw new MovimentoInvalidoException("Movimento inválido");
         }
 
+        if (getPeca(destino) != null) {
+            throw new MovimentoInvalidoException("Destino ocupado");
+        }
+
         // Trata captura (para damas)
         int diffLinha = Math.abs(destino.getLinha() - origem.getLinha());
         if (diffLinha >= 2) {
@@ -111,12 +115,25 @@ public class Tabuleiro implements Serializable {
     public boolean podeMover(Posicao origem, Posicao destino) {
         try {
             Peca peca = getPeca(origem);
-            return peca != null && 
-                   peca.podeMoverPara(destino, this) && 
+            return peca != null &&
+                   peca.podeMoverPara(destino, this) &&
                    getPeca(destino) == null;
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public int contarPecas(CorPeca cor) {
+        int contador = 0;
+        for (int i = 0; i < TAMANHO; i++) {
+            for (int j = 0; j < TAMANHO; j++) {
+                Peca p = grade[i][j];
+                if (p != null && p.getCor() == cor) {
+                    contador++;
+                }
+            }
+        }
+        return contador;
     }
 
     private void validarPosicao(Posicao posicao) throws PosicaoInvalidaException {
