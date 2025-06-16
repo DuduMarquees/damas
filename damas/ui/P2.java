@@ -8,11 +8,11 @@ import java.io.*;
 public class P2 {
     public static void main(String[] args) {
         try {
-            ConfiguracaoJogo config = carregarConfiguracaoTexto("config_inicial.txt");
-            mostrarDialogoConfiguracao(config);
-            salvarConfiguracaoTexto(config, "config_inicial.txt");
-            salvarConfiguracaoBinaria(config, "jogo_config.dat");
-
+            ConfiguracaoJogo config = carregarConfiguracaoTexto("config_inicial.txt"); //Carrega configuração base
+            mostrarDialogoConfiguracao(config); //Permite edição via interface gráfica
+            salvarConfiguracaoTexto(config, "config_inicial.txt"); //Salva configurações atualizadas
+            salvarConfiguracaoBinaria(config, "jogo_config.dat"); 
+            // cria o jogo e inicia a interface
             Jogo jogo = new Jogo(config);
             new InterfaceJogo(jogo).iniciar();
         } catch (Exception e) {

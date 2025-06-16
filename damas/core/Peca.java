@@ -10,7 +10,7 @@ import damas.exceptions.MovimentoInvalidoException;
 public abstract class Peca implements Serializable {
     private static final long serialVersionUID = 1L;
     
-    protected CorPeca cor; // Atributo PROTEGIDO para acesso pelas subclasses
+    protected CorPeca cor; // Atributo protegido para acesso pelas subclasses
     protected Posicao posicao;
     
     public Peca(CorPeca cor, Posicao posicao) {
@@ -26,7 +26,7 @@ public abstract class Peca implements Serializable {
         this.posicao = posicao;
     }
     
-    // Método ABSTRATO - deve ser implementado pelas subclasses (POLIMORFISMO)
+    // Método abstrato - deve ser implementado pelas subclasses (POLIMORFISMO)
     public abstract boolean podeMoverPara(Posicao destino, Tabuleiro tabuleiro) 
             throws MovimentoInvalidoException;
     

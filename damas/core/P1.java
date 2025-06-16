@@ -56,8 +56,8 @@ public class P1 {
      */
     private static void salvarConfiguracaoBinaria(ConfiguracaoJogo config, String nomeArquivo) 
             throws IOException {
-        try (ObjectOutputStream oos = new ObjectOutputStream(
-                new FileOutputStream(nomeArquivo))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream( // traduz objeto para bytes
+                new FileOutputStream(nomeArquivo))) { // Cria conexão com arquivo físico no disco, caminho pra escrever bytes no arquivo
             oos.writeObject(config);
         }
     }
